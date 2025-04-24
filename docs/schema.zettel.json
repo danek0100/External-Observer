@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Zettel Document Schema",
+  "description": "Схема документа в формате Zettel (JSON + Markdown)",
+  "type": "object",
+  "required": ["id", "type", "created", "content"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Уникальный идентификатор документа",
+      "pattern": "^[a-z0-9-]+$"
+    },
+    "type": {
+      "type": "string",
+      "description": "Тип документа",
+      "enum": ["zettel", "task", "event", "finance", "health", "contact", "diary"]
+    },
+    "path": {
+      "type": "string",
+      "description": "Путь к документу в структуре",
+      "pattern": "^[a-z0-9/-]+$"
+    },
+    "created": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Дата и время создания документа"
+    },
+    "updated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Дата и время последнего обновления"
+    },
+    "tags": {
+      "type": "array",
+      "description": "Теги документа",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9-]+$"
+      },
+      "uniqueItems": true
+    },
+    "links": {
+      "type": "array",
+      "description": "Связи с другими документами",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9-]+$"
+      },
+      "uniqueItems": true
+    },
+    "content": {
+      "type": "string",
+      "description": "Содержимое документа в формате Markdown"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Дополнительные метаданные в зависимости от типа документа",
+      "additionalProperties": true
+    },
+    "status": {
+      "type": "string",
+      "description": "Статус документа",
+      "enum": ["draft", "active", "archived", "deleted"]
+    },
+    "version": {
+      "type": "integer",
+      "description": "Версия документа",
+      "minimum": 1
+    }
+  }
+} 
