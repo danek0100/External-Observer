@@ -1,36 +1,46 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeftIcon } from '@heroicons/react/24/outline'
-import ZettelContent from '../components/ZettelContent'
-import { Zettel } from '../types/zettel'
+import { NoteContent } from '../components/NoteContent'
+import { NoteGraph } from '../components/NoteGraph'
+import { Note } from '../types/note'
 import axios from 'axios'
 
 export default function NoteDetail() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const [zettel, setZettel] = useState<Zettel | null>(null)
+  const [note, setNote] = useState<Note | null>(null)
+  const [allNotes, setAllNotes] = useState<Note[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const fetchZettel = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true)
-        const response = await axios.get<Zettel>(`/api/notes/${id}`)
-        setZettel(response.data)
+        const [noteResponse, notesResponse] = await Promise.all([
+          axios.get<Note>(`/api/notes/${id}`),
+          axios.get<Note[]>('/api/notes')
+        ])
+        setNote(noteResponse.data)
+        setAllNotes(notesResponse.data)
         setError(null)
       } catch (err) {
         setError('Не удалось загрузить заметку')
-        console.error('Error fetching zettel:', err)
+        console.error('Error fetching data:', err)
       } finally {
         setLoading(false)
       }
     }
 
     if (id) {
-      fetchZettel()
+      fetchData()
     }
   }, [id])
+
+  const handleNoteClick = (noteId: string) => {
+    navigate(`/notes/${noteId}`)
+  }
 
   if (loading) {
     return (
@@ -55,7 +65,7 @@ export default function NoteDetail() {
     )
   }
 
-  if (!zettel) {
+  if (!note) {
     return (
       <div className="text-center py-12">
         <h2 className="text-lg font-medium text-gray-900">Заметка не найдена</h2>
@@ -82,9 +92,22 @@ export default function NoteDetail() {
         </button>
       </div>
 
-      <div className="bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl md:col-span-2">
-        <div className="px-4 py-6 sm:p-8">
-          <ZettelContent zettel={zettel} />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="md:col-span-2">
+          <div className="bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl">
+            <div className="px-4 py-6 sm:p-8">
+              <h1 className="text-2xl font-semibold mb-4">{note.title}</h1>
+              <NoteContent note={note} onNoteClick={handleNoteClick} />
+            </div>
+          </div>
+        </div>
+        
+        <div className="md:col-span-1">
+          <NoteGraph 
+            notes={allNotes}
+            currentNoteId={note.id}
+            onNoteClick={handleNoteClick}
+          />
         </div>
       </div>
     </div>

@@ -8,17 +8,20 @@ import java.util.List;
 import java.util.Map;
 
 @Data
-@Document(collection = "zettels")
-public class Zettel {
+@Document(collection = "notes")
+public class Note {
     @Id
     private String id;
+    private String title;
+    private String content;
+    private String createdAt;
+    private String updatedAt;
     private String type;
     private String path;
     private LocalDateTime created;
     private LocalDateTime updated;
     private List<String> tags;
     private List<String> links;
-    private String content;
     private Map<String, Object> metadata;
     private String status;
     private Integer version;

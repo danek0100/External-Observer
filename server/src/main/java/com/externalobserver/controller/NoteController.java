@@ -1,7 +1,7 @@
 package com.externalobserver.controller;
 
-import com.externalobserver.model.Zettel;
-import com.externalobserver.service.ZettelService;
+import com.externalobserver.model.Note;
+import com.externalobserver.service.NoteService;
 import com.externalobserver.dto.ZettelRequest;
 import com.externalobserver.dto.ZettelSearchRequest;
 import lombok.RequiredArgsConstructor;
@@ -18,118 +18,108 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 @RestController
 @RequestMapping("/api/notes")
 @RequiredArgsConstructor
-@Tag(name = "Zettel", description = "API для работы с документами Zettel")
-public class ZettelController {
-    private final ZettelService zettelService;
+@Tag(name = "Note", description = "API для работы с заметками")
+public class NoteController {
+    private final NoteService noteService;
 
-    @Operation(summary = "Получить все документы")
+    @Operation(summary = "Получить все заметки")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Успешно получены все документы"),
+        @ApiResponse(responseCode = "200", description = "Успешно получены все заметки"),
         @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
     @GetMapping
-    public ResponseEntity<List<Zettel>> getAllZettels() {
-        return ResponseEntity.ok(zettelService.getAllZettels());
+    public ResponseEntity<List<Note>> getAllNotes() {
+        return ResponseEntity.ok(noteService.getAllNotes());
     }
 
-    @Operation(summary = "Создать новый документ")
+    @Operation(summary = "Создать новую заметку")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Документ успешно создан"),
+        @ApiResponse(responseCode = "200", description = "Заметка успешно создана"),
         @ApiResponse(responseCode = "400", description = "Неверный формат запроса"),
         @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
     @PostMapping
-    public ResponseEntity<Zettel> createZettel(
-            @Parameter(description = "Данные для создания документа") 
-            @Valid @RequestBody ZettelRequest request) {
-        return ResponseEntity.ok(zettelService.createZettel(request));
+    public ResponseEntity<Note> createNote(@RequestBody Note note) {
+        return ResponseEntity.ok(noteService.createNote(note));
     }
 
-    @Operation(summary = "Обновить существующий документ")
+    @Operation(summary = "Обновить существующую заметку")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Документ успешно обновлен"),
+        @ApiResponse(responseCode = "200", description = "Заметка успешно обновлена"),
         @ApiResponse(responseCode = "400", description = "Неверный формат запроса"),
-        @ApiResponse(responseCode = "404", description = "Документ не найден"),
+        @ApiResponse(responseCode = "404", description = "Заметка не найдена"),
         @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<Zettel> updateZettel(
-            @Parameter(description = "ID документа") 
-            @PathVariable String id,
-            @Parameter(description = "Данные для обновления документа") 
-            @Valid @RequestBody ZettelRequest request) {
-        return zettelService.updateZettel(id, request)
+    public ResponseEntity<Note> updateNote(@PathVariable String id, @RequestBody Note note) {
+        return noteService.updateNote(id, note)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "Удалить документ")
+    @Operation(summary = "Удалить заметку")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Документ успешно удален"),
-        @ApiResponse(responseCode = "404", description = "Документ не найден"),
+        @ApiResponse(responseCode = "200", description = "Заметка успешно удалена"),
+        @ApiResponse(responseCode = "404", description = "Заметка не найдена"),
         @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteZettel(
-            @Parameter(description = "ID документа") 
-            @PathVariable String id) {
-        zettelService.deleteZettel(id);
+    public ResponseEntity<Void> deleteNote(@PathVariable String id) {
+        noteService.deleteNote(id);
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "Получить документ по ID")
+    @Operation(summary = "Получить заметку по ID")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Документ найден"),
-        @ApiResponse(responseCode = "404", description = "Документ не найден"),
+        @ApiResponse(responseCode = "200", description = "Заметка найдена"),
+        @ApiResponse(responseCode = "404", description = "Заметка не найдена"),
         @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
     @GetMapping("/{id}")
-    public ResponseEntity<Zettel> getZettelById(
-            @Parameter(description = "ID документа") 
-            @PathVariable String id) {
-        return zettelService.getZettelById(id)
+    public ResponseEntity<Note> getNoteById(@PathVariable String id) {
+        return noteService.getNoteById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "Поиск документов по различным критериям")
+    @Operation(summary = "Поиск заметок по различным критериям")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Поиск выполнен успешно"),
         @ApiResponse(responseCode = "400", description = "Неверный формат запроса"),
         @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
     @PostMapping("/search")
-    public ResponseEntity<List<Zettel>> searchZettels(
+    public ResponseEntity<List<Note>> searchNotes(
             @Parameter(description = "Параметры поиска") 
             @RequestBody ZettelSearchRequest searchRequest) {
-        return ResponseEntity.ok(zettelService.searchZettels(searchRequest));
+        return ResponseEntity.ok(noteService.searchNotes(searchRequest));
     }
 
-    @Operation(summary = "Поиск документов по тегам")
+    @Operation(summary = "Поиск заметок по тегам")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Поиск выполнен успешно"),
         @ApiResponse(responseCode = "400", description = "Неверный формат запроса"),
         @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
     @GetMapping("/search/tags")
-    public ResponseEntity<List<Zettel>> searchByTags(
+    public ResponseEntity<List<Note>> searchByTags(
             @Parameter(description = "Список тегов для поиска") 
             @RequestParam List<String> tags,
-            @Parameter(description = "Если true, документ должен содержать все указанные теги") 
+            @Parameter(description = "Если true, заметка должна содержать все указанные теги") 
             @RequestParam(defaultValue = "false") boolean matchAll) {
-        return ResponseEntity.ok(zettelService.findByTags(tags, matchAll));
+        return ResponseEntity.ok(noteService.findByTags(tags, matchAll));
     }
 
-    @Operation(summary = "Поиск документов по ключевому слову в контенте")
+    @Operation(summary = "Поиск заметок по ключевому слову в контенте")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Поиск выполнен успешно"),
         @ApiResponse(responseCode = "400", description = "Неверный формат запроса"),
         @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
     @GetMapping("/search/keyword")
-    public ResponseEntity<List<Zettel>> searchByKeyword(
+    public ResponseEntity<List<Note>> searchByKeyword(
             @Parameter(description = "Ключевое слово для поиска") 
             @RequestParam String keyword) {
-        return ResponseEntity.ok(zettelService.findByKeyword(keyword));
+        return ResponseEntity.ok(noteService.findByKeyword(keyword));
     }
 } 

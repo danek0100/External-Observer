@@ -10,6 +10,9 @@ import com.mongodb.client.MongoClients;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
+import org.springframework.data.mongodb.core.convert.DefaultDbRefResolver;
+import org.springframework.data.mongodb.MongoDatabaseFactory;
+import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 import java.util.Collections;
 
 @Configuration
@@ -25,8 +28,13 @@ public class MongoConfig {
     }
 
     @Bean
+    public MongoDatabaseFactory mongoDatabaseFactory() {
+        return new SimpleMongoClientDatabaseFactory(mongoClient(), "external-observer");
+    }
+
+    @Bean
     public MongoTemplate mongoTemplate() {
-        return new MongoTemplate(mongoClient(), "external-observer");
+        return new MongoTemplate(mongoDatabaseFactory());
     }
 
     @Bean
@@ -39,9 +47,14 @@ public class MongoConfig {
             MongoMappingContext context,
             MongoCustomConversions conversions) {
         MappingMongoConverter converter = new MappingMongoConverter(
-                new DefaultDbRefResolver(mongoTemplate().getDbFactory()),
+                new DefaultDbRefResolver(mongoDatabaseFactory()),
                 context);
         converter.setCustomConversions(conversions);
         return converter;
+    }
+
+    @Bean
+    public MongoMappingContext mongoMappingContext() {
+        return new MongoMappingContext();
     }
 } 

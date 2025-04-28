@@ -1,7 +1,7 @@
 package com.externalobserver.service;
 
-import com.externalobserver.model.Zettel;
-import com.externalobserver.repository.ZettelRepository;
+import com.externalobserver.model.Note;
+import com.externalobserver.repository.NoteRepository;
 import com.externalobserver.dto.ZettelRequest;
 import com.externalobserver.dto.ZettelSearchRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -19,26 +20,28 @@ import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
-class ZettelServiceTest {
+class NoteServiceTest {
 
     @Mock
-    private ZettelRepository zettelRepository;
+    private NoteRepository noteRepository;
 
-    @InjectMocks
-    private ZettelService zettelService;
+    private NoteService noteService;
 
-    private Zettel testZettel;
+    private Note testNote;
     private ZettelRequest testRequest;
 
     @BeforeEach
     void setUp() {
-        testZettel = new Zettel();
-        testZettel.setId("test-id");
-        testZettel.setType("zettel");
-        testZettel.setContent("Test content");
-        testZettel.setTags(Arrays.asList("test", "unit"));
-        testZettel.setCreated(LocalDateTime.now());
-        testZettel.setVersion(1);
+        MockitoAnnotations.openMocks(this);
+        noteService = new NoteService(noteRepository);
+
+        testNote = new Note();
+        testNote.setId("test-id");
+        testNote.setTitle("Test Note");
+        testNote.setContent("Test content");
+        testNote.setTags(Arrays.asList("test", "unit"));
+        testNote.setCreated(LocalDateTime.now());
+        testNote.setVersion(1);
 
         testRequest = new ZettelRequest();
         testRequest.setType("zettel");
@@ -47,89 +50,99 @@ class ZettelServiceTest {
     }
 
     @Test
-    void getAllZettels_ShouldReturnAllZettels() {
-        when(zettelRepository.findAll()).thenReturn(Arrays.asList(testZettel));
+    void getAllNotes_ShouldReturnAllNotes() {
+        when(noteRepository.findAll()).thenReturn(Arrays.asList(testNote));
         
-        List<Zettel> result = zettelService.getAllZettels();
+        List<Note> result = noteService.getAllNotes();
         
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals(testZettel.getId(), result.get(0).getId());
-        verify(zettelRepository).findAll();
+        assertEquals(testNote.getId(), result.get(0).getId());
+        verify(noteRepository).findAll();
     }
 
     @Test
-    void createZettel_ShouldCreateNewZettel() {
-        when(zettelRepository.save(any(Zettel.class))).thenReturn(testZettel);
+    void createNote_ShouldSaveAndReturnNote() {
+        when(noteRepository.save(any(Note.class))).thenReturn(testNote);
         
-        Zettel result = zettelService.createZettel(testRequest);
+        Note result = noteService.createNote(testNote);
         
         assertNotNull(result);
-        assertEquals(testZettel.getId(), result.getId());
-        assertEquals(testZettel.getType(), result.getType());
-        assertEquals(testZettel.getContent(), result.getContent());
-        verify(zettelRepository).save(any(Zettel.class));
+        assertEquals(testNote.getId(), result.getId());
+        assertEquals(testNote.getTitle(), result.getTitle());
+        assertEquals(testNote.getContent(), result.getContent());
+        verify(noteRepository).save(any(Note.class));
     }
 
     @Test
-    void updateZettel_WhenZettelExists_ShouldUpdateZettel() {
-        when(zettelRepository.findById(testZettel.getId())).thenReturn(Optional.of(testZettel));
-        when(zettelRepository.save(any(Zettel.class))).thenReturn(testZettel);
+    void updateNote_WhenNoteExists_ShouldUpdateAndReturnNote() {
+        when(noteRepository.findById(testNote.getId())).thenReturn(Optional.of(testNote));
+        when(noteRepository.save(any(Note.class))).thenReturn(testNote);
         
-        Optional<Zettel> result = zettelService.updateZettel(testZettel.getId(), testRequest);
+        Optional<Note> result = noteService.updateNote(testNote.getId(), testNote);
         
         assertTrue(result.isPresent());
-        assertEquals(testZettel.getId(), result.get().getId());
-        verify(zettelRepository).findById(testZettel.getId());
-        verify(zettelRepository).save(any(Zettel.class));
+        assertEquals(testNote.getId(), result.get().getId());
+        verify(noteRepository).findById(testNote.getId());
+        verify(noteRepository).save(any(Note.class));
     }
 
     @Test
-    void updateZettel_WhenZettelDoesNotExist_ShouldReturnEmpty() {
-        when(zettelRepository.findById("non-existent")).thenReturn(Optional.empty());
+    void updateNote_WhenNoteDoesNotExist_ShouldReturnEmpty() {
+        when(noteRepository.findById("non-existent")).thenReturn(Optional.empty());
         
-        Optional<Zettel> result = zettelService.updateZettel("non-existent", testRequest);
+        Optional<Note> result = noteService.updateNote("non-existent", testNote);
         
         assertTrue(result.isEmpty());
-        verify(zettelRepository).findById("non-existent");
-        verify(zettelRepository, never()).save(any(Zettel.class));
+        verify(noteRepository).findById("non-existent");
+        verify(noteRepository, never()).save(any(Note.class));
     }
 
     @Test
-    void deleteZettel_ShouldDeleteZettel() {
-        doNothing().when(zettelRepository).deleteById(testZettel.getId());
+    void deleteNote_ShouldCallRepositoryDelete() {
+        doNothing().when(noteRepository).deleteById(testNote.getId());
         
-        zettelService.deleteZettel(testZettel.getId());
+        noteService.deleteNote(testNote.getId());
         
-        verify(zettelRepository).deleteById(testZettel.getId());
+        verify(noteRepository).deleteById(testNote.getId());
     }
 
     @Test
-    void getZettelById_WhenZettelExists_ShouldReturnZettel() {
-        when(zettelRepository.findById(testZettel.getId())).thenReturn(Optional.of(testZettel));
+    void getNoteById_WhenNoteExists_ShouldReturnNote() {
+        when(noteRepository.findById(testNote.getId())).thenReturn(Optional.of(testNote));
         
-        Optional<Zettel> result = zettelService.getZettelById(testZettel.getId());
+        Optional<Note> result = noteService.getNoteById(testNote.getId());
         
         assertTrue(result.isPresent());
-        assertEquals(testZettel.getId(), result.get().getId());
-        verify(zettelRepository).findById(testZettel.getId());
+        assertEquals(testNote.getId(), result.get().getId());
+        verify(noteRepository).findById(testNote.getId());
     }
 
     @Test
-    void searchZettels_WithTagsAndKeyword_ShouldReturnMatchingZettels() {
+    void getNoteById_WhenNoteDoesNotExist_ShouldReturnEmpty() {
+        when(noteRepository.findById("non-existent")).thenReturn(Optional.empty());
+        
+        Optional<Note> result = noteService.getNoteById("non-existent");
+        
+        assertTrue(result.isEmpty());
+        verify(noteRepository).findById("non-existent");
+    }
+
+    @Test
+    void searchNotes_WithTagsAndKeyword_ShouldReturnMatchingNotes() {
         ZettelSearchRequest searchRequest = new ZettelSearchRequest();
         searchRequest.setTags(Arrays.asList("test"));
         searchRequest.setKeyword("content");
         
-        when(zettelRepository.findByTagsInOrContentContainingIgnoreCase(
-            anyList(), anyString())).thenReturn(Arrays.asList(testZettel));
+        when(noteRepository.findByTagsInOrContentContainingIgnoreCase(
+            anyList(), anyString())).thenReturn(Arrays.asList(testNote));
         
-        List<Zettel> result = zettelService.searchZettels(searchRequest);
+        List<Note> result = noteService.searchNotes(searchRequest);
         
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals(testZettel.getId(), result.get(0).getId());
-        verify(zettelRepository).findByTagsInOrContentContainingIgnoreCase(
+        assertEquals(testNote.getId(), result.get(0).getId());
+        verify(noteRepository).findByTagsInOrContentContainingIgnoreCase(
             searchRequest.getTags(), searchRequest.getKeyword());
     }
 } 
