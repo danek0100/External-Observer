@@ -21,6 +21,8 @@ services:
     environment:
       - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/external_observer
       - SPRING_PROFILES_ACTIVE=dev
+    networks:
+      - app-network
 
   frontend:
     build:
@@ -35,6 +37,12 @@ services:
       - VITE_API_URL=http://localhost:8080
     depends_on:
       - backend
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
 
 volumes:
   mongodb_data: 

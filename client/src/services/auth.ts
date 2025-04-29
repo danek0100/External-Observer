@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from './api';
 
 const API_URL = '/api';
 
@@ -13,7 +13,7 @@ export interface LoginResponse {
 
 export const authService = {
     login: async (username: string, password: string): Promise<string> => {
-        const response = await axios.post<LoginResponse>(`${API_URL}/auth/login`, {
+        const response = await api.post<LoginResponse>('/auth/login', {
             username,
             password
         });
