@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { PlusIcon } from '@heroicons/react/24/outline'
 import ZettelForm from './ZettelForm'
 import { ZettelRequest } from '../types/zettel'
-import axios from 'axios'
+import api from '../services/api'
 
 export default function ZettelCreate() {
   const navigate = useNavigate()
@@ -13,7 +13,7 @@ export default function ZettelCreate() {
   const handleSubmit = async (data: ZettelRequest) => {
     try {
       setIsSubmitting(true)
-      const response = await axios.post<{ id: string }>('/api/notes', data)
+      const response = await api.post<{ id: string }>('/api/notes', data)
       navigate(`/notes/${response.data.id}`)
     } catch (err) {
       setError('Не удалось создать заметку')

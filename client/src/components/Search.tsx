@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { Zettel } from '../types/zettel';
-import axios from 'axios';
+import api from '../services/api';
 
 interface SearchResult {
   id: string;
@@ -39,7 +39,7 @@ export default function Search() {
 
       setIsLoading(true);
       try {
-        const response = await axios.get<SearchResult[]>('/api/search', {
+        const response = await api.get<SearchResult[]>('/search', {
           params: { q: query }
         });
         setResults(response.data);
@@ -62,23 +62,21 @@ export default function Search() {
   };
 
   return (
-    <div ref={searchRef} className="relative w-full max-w-2xl">
+    <div ref={searchRef} className="relative">
       <div className="relative">
         <input
           type="text"
           value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            setShowResults(true);
-          }}
+          onChange={(e) => setQuery(e.target.value)}
+          onFocus={() => setShowResults(true)}
           placeholder="Поиск заметок..."
-          className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
         />
         <MagnifyingGlassIcon className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
         {query && (
           <button
             onClick={() => setQuery('')}
-            className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+            className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-500"
           >
             <XMarkIcon className="h-5 w-5" />
           </button>
@@ -86,20 +84,18 @@ export default function Search() {
       </div>
 
       {showResults && (query || isLoading) && (
-        <div className="absolute z-10 w-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 max-h-96 overflow-y-auto">
+        <div className="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md border border-gray-200 max-h-96 overflow-auto">
           {isLoading ? (
-            <div className="p-4 text-center text-gray-500">
-              Поиск...
-            </div>
+            <div className="p-4 text-center text-gray-500">Поиск...</div>
           ) : results.length > 0 ? (
-            <ul className="py-2">
+            <ul>
               {results.map((result) => (
                 <li
                   key={result.id}
                   onClick={() => handleResultClick(result)}
                   className="px-4 py-2 hover:bg-gray-50 cursor-pointer"
                 >
-                  <div className="font-medium text-gray-900">{result.title}</div>
+                  <div className="font-medium">{result.title}</div>
                   {result.path && (
                     <div className="text-sm text-gray-500">{result.path}</div>
                   )}
@@ -108,9 +104,7 @@ export default function Search() {
               ))}
             </ul>
           ) : (
-            <div className="p-4 text-center text-gray-500">
-              Ничего не найдено
-            </div>
+            <div className="p-4 text-center text-gray-500">Ничего не найдено</div>
           )}
         </div>
       )}

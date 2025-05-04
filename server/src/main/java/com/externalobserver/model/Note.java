@@ -25,4 +25,5 @@ public class Note {
     private Map<String, Object> metadata;
     private String status;
     private Integer version;
+    private String username;
 } 

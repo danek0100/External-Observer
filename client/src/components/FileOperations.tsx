@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
-import axios from 'axios';
 import { ArrowDownTrayIcon, ArrowUpTrayIcon } from '@heroicons/react/24/outline';
+import api from '../services/api';
 
 export const FileOperations: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -15,7 +15,7 @@ export const FileOperations: React.FC = () => {
     });
 
     try {
-      await axios.post('/api/files/import', formData, {
+      await api.post('/files/import', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -28,7 +28,7 @@ export const FileOperations: React.FC = () => {
 
   const handleExport = async () => {
     try {
-      const response = await axios.get('/api/files/export', {
+      const response = await api.get('/files/export', {
         responseType: 'blob',
       });
       
@@ -50,25 +50,23 @@ export const FileOperations: React.FC = () => {
         type="file"
         ref={fileInputRef}
         onChange={handleImport}
-        accept=".md"
-        multiple
         className="hidden"
+        multiple
+        accept=".md,.txt"
       />
-      
       <button
         onClick={() => fileInputRef.current?.click()}
-        className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+        className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
       >
-        <ArrowUpTrayIcon className="h-5 w-5 mr-2" />
-        Импорт .md
+        <ArrowUpTrayIcon className="-ml-0.5 mr-2 h-4 w-4" aria-hidden="true" />
+        Импорт
       </button>
-
       <button
         onClick={handleExport}
-        className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+        className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
       >
-        <ArrowDownTrayIcon className="h-5 w-5 mr-2" />
-        Экспорт ZIP
+        <ArrowDownTrayIcon className="-ml-0.5 mr-2 h-4 w-4" aria-hidden="true" />
+        Экспорт
       </button>
     </div>
   );

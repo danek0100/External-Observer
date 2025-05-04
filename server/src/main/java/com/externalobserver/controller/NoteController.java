@@ -6,6 +6,7 @@ import com.externalobserver.dto.ZettelRequest;
 import com.externalobserver.dto.ZettelSearchRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -22,9 +23,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 public class NoteController {
     private final NoteService noteService;
 
-    @Operation(summary = "Получить все заметки")
+    @Operation(summary = "Получить все заметки пользователя")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Успешно получены все заметки"),
+        @ApiResponse(responseCode = "401", description = "Не авторизован"),
         @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
     @GetMapping
@@ -36,6 +38,7 @@ public class NoteController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Заметка успешно создана"),
         @ApiResponse(responseCode = "400", description = "Неверный формат запроса"),
+        @ApiResponse(responseCode = "401", description = "Не авторизован"),
         @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
     @PostMapping
@@ -47,6 +50,7 @@ public class NoteController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Заметка успешно обновлена"),
         @ApiResponse(responseCode = "400", description = "Неверный формат запроса"),
+        @ApiResponse(responseCode = "401", description = "Не авторизован"),
         @ApiResponse(responseCode = "404", description = "Заметка не найдена"),
         @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
@@ -60,6 +64,7 @@ public class NoteController {
     @Operation(summary = "Удалить заметку")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Заметка успешно удалена"),
+        @ApiResponse(responseCode = "401", description = "Не авторизован"),
         @ApiResponse(responseCode = "404", description = "Заметка не найдена"),
         @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
@@ -72,6 +77,7 @@ public class NoteController {
     @Operation(summary = "Получить заметку по ID")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Заметка найдена"),
+        @ApiResponse(responseCode = "401", description = "Не авторизован"),
         @ApiResponse(responseCode = "404", description = "Заметка не найдена"),
         @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
@@ -82,23 +88,11 @@ public class NoteController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "Поиск заметок по различным критериям")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Поиск выполнен успешно"),
-        @ApiResponse(responseCode = "400", description = "Неверный формат запроса"),
-        @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
-    })
-    @PostMapping("/search")
-    public ResponseEntity<List<Note>> searchNotes(
-            @Parameter(description = "Параметры поиска") 
-            @RequestBody ZettelSearchRequest searchRequest) {
-        return ResponseEntity.ok(noteService.searchNotes(searchRequest));
-    }
-
     @Operation(summary = "Поиск заметок по тегам")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Поиск выполнен успешно"),
         @ApiResponse(responseCode = "400", description = "Неверный формат запроса"),
+        @ApiResponse(responseCode = "401", description = "Не авторизован"),
         @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
     @GetMapping("/search/tags")
@@ -114,6 +108,7 @@ public class NoteController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Поиск выполнен успешно"),
         @ApiResponse(responseCode = "400", description = "Неверный формат запроса"),
+        @ApiResponse(responseCode = "401", description = "Не авторизован"),
         @ApiResponse(responseCode = "500", description = "Внутренняя ошибка сервера")
     })
     @GetMapping("/search/keyword")

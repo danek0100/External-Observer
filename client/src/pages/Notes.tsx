@@ -3,7 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { PlusIcon } from '@heroicons/react/24/outline'
 import ZettelCard from '../components/ZettelCard'
 import { Zettel } from '../types/zettel'
-import axios from 'axios'
+import api from '../services/api'
 
 export default function Notes() {
   const [searchParams] = useSearchParams()
@@ -16,7 +16,7 @@ export default function Notes() {
     const fetchZettels = async () => {
       try {
         setLoading(true)
-        const response = await axios.get<Zettel[]>('/api/notes', {
+        const response = await api.get<Zettel[]>('/api/notes', {
           params: { path }
         })
         setZettels(response.data)

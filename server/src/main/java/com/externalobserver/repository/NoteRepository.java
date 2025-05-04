@@ -22,4 +22,10 @@ public interface NoteRepository extends MongoRepository<Note, String> {
     
     @Query("{ $or: [ { 'tags': { $in: ?0 } }, { 'content': { $regex: ?1, $options: 'i' } } ] }")
     List<Note> findByTagsInOrContentContainingIgnoreCase(List<String> tags, String keyword);
+
+    List<Note> findByUsername(String username);
+    List<Note> findByTagsInAndUsername(List<String> tags, String username);
+    List<Note> findByContentContainingIgnoreCaseAndUsername(String keyword, String username);
+    Optional<Note> findByIdAndUsername(String id, String username);
+    void deleteByIdAndUsername(String id, String username);
 } 

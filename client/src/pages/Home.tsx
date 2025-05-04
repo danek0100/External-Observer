@@ -1,12 +1,32 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { PlusIcon } from '@heroicons/react/24/outline'
 import ZettelCard from '../components/ZettelCard'
 import { Zettel } from '../types/zettel'
+import api from '../services/api'
 
 export default function Home() {
   const [recentZettels, setRecentZettels] = useState<Zettel[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchZettels = async () => {
+      try {
+        setLoading(true)
+        const response = await api.get<Zettel[]>('/api/notes')
+        setRecentZettels(response.data)
+        setError(null)
+      } catch (err) {
+        setError('Не удалось загрузить заметки')
+        console.error('Error fetching zettels:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchZettels()
+  }, [])
 
   return (
     <div className="space-y-8">
@@ -33,6 +53,10 @@ export default function Home() {
           <div className="col-span-full text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
             <p className="mt-4 text-sm text-gray-500">Загрузка...</p>
+          </div>
+        ) : error ? (
+          <div className="col-span-full text-center py-12">
+            <p className="text-sm text-red-500">{error}</p>
           </div>
         ) : recentZettels.length > 0 ? (
           recentZettels.map((zettel) => (

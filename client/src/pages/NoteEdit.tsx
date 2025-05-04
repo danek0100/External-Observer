@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeftIcon } from '@heroicons/react/24/outline'
 import ZettelForm from '../components/ZettelForm'
 import { Zettel, ZettelRequest } from '../types/zettel'
-import axios from 'axios'
+import api from '../services/api'
 
 export default function NoteEdit() {
   const { id } = useParams<{ id: string }>()
@@ -17,7 +17,7 @@ export default function NoteEdit() {
     const fetchZettel = async () => {
       try {
         setLoading(true)
-        const response = await axios.get<Zettel>(`/api/notes/${id}`)
+        const response = await api.get<Zettel>(`/api/notes/${id}`)
         setZettel(response.data)
         setError(null)
       } catch (err) {
@@ -37,9 +37,9 @@ export default function NoteEdit() {
     try {
       setIsSubmitting(true)
       if (id) {
-        await axios.put(`/api/notes/${id}`, data)
+        await api.put(`/api/notes/${id}`, data)
       } else {
-        await axios.post('/api/notes', data)
+        await api.post('/api/notes', data)
       }
       navigate(`/notes/${id}`)
     } catch (err) {

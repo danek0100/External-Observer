@@ -9,7 +9,7 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'http://backend:8080',
+        target: 'http://eo-backend:8080',
         changeOrigin: true,
         secure: false,
         ws: true

@@ -33,6 +33,7 @@ public class SecurityConfig {
             .and()
             .authorizeHttpRequests()
                 .requestMatchers("/api/auth/**", "/swagger-ui/**", "/api-docs/**").permitAll()
+                .requestMatchers("/api/notes/**").authenticated()
                 .anyRequest().authenticated()
             .and()
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
@@ -44,7 +45,8 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+        configuration.setExposedHeaders(Arrays.asList("Authorization"));
         configuration.setAllowCredentials(true);
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -57,7 +59,7 @@ public class SecurityConfig {
         UserDetails user = User.builder()
             .username("admin")
             .password(passwordEncoder().encode("admin"))
-            .roles("ADMIN")
+            .roles("USER")
             .build();
 
         return new InMemoryUserDetailsManager(user);

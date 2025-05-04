@@ -4,7 +4,7 @@ import { ArrowLeftIcon } from '@heroicons/react/24/outline'
 import { NoteContent } from '../components/NoteContent'
 import { NoteGraph } from '../components/NoteGraph'
 import { Note } from '../types/note'
-import axios from 'axios'
+import api from '../services/api'
 
 export default function NoteDetail() {
   const { id } = useParams<{ id: string }>()
@@ -19,8 +19,8 @@ export default function NoteDetail() {
       try {
         setLoading(true)
         const [noteResponse, notesResponse] = await Promise.all([
-          axios.get<Note>(`/api/notes/${id}`),
-          axios.get<Note[]>('/api/notes')
+          api.get<Note>(`/api/notes/${id}`),
+          api.get<Note[]>('/api/notes')
         ])
         setNote(noteResponse.data)
         setAllNotes(notesResponse.data)
@@ -52,15 +52,12 @@ export default function NoteDetail() {
 
   if (error) {
     return (
-      <div className="text-center py-12">
-        <h2 className="text-lg font-medium text-gray-900">{error}</h2>
-        <button
-          onClick={() => navigate('/notes')}
-          className="mt-4 inline-flex items-center text-sm font-medium text-primary-600 hover:text-primary-500"
-        >
-          <ArrowLeftIcon className="mr-1 h-4 w-4" />
-          Вернуться к списку заметок
-        </button>
+      <div className="rounded-md bg-red-50 p-4">
+        <div className="flex">
+          <div className="ml-3">
+            <h3 className="text-sm font-medium text-red-800">{error}</h3>
+          </div>
+        </div>
       </div>
     )
   }
@@ -68,46 +65,36 @@ export default function NoteDetail() {
   if (!note) {
     return (
       <div className="text-center py-12">
-        <h2 className="text-lg font-medium text-gray-900">Заметка не найдена</h2>
-        <button
-          onClick={() => navigate('/notes')}
-          className="mt-4 inline-flex items-center text-sm font-medium text-primary-600 hover:text-primary-500"
-        >
-          <ArrowLeftIcon className="mr-1 h-4 w-4" />
-          Вернуться к списку заметок
-        </button>
+        <p className="text-sm text-gray-500">Заметка не найдена</p>
       </div>
     )
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center">
-        <button
-          onClick={() => navigate('/notes')}
-          className="inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-700"
-        >
-          <ArrowLeftIcon className="mr-1 h-4 w-4" />
-          Назад
-        </button>
+      <div className="sm:flex sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">{note.title}</h1>
+          <p className="mt-2 text-sm text-gray-700">
+            {note.path}
+          </p>
+        </div>
+        <div className="mt-4 sm:mt-0">
+          <button
+            onClick={() => navigate(`/notes/${id}/edit`)}
+            className="inline-flex items-center rounded-md bg-primary-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-500"
+          >
+            Редактировать
+          </button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2">
-          <div className="bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl">
-            <div className="px-4 py-6 sm:p-8">
-              <h1 className="text-2xl font-semibold mb-4">{note.title}</h1>
-              <NoteContent note={note} onNoteClick={handleNoteClick} />
-            </div>
-          </div>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <NoteContent note={note} />
         </div>
-        
-        <div className="md:col-span-1">
-          <NoteGraph 
-            notes={allNotes}
-            currentNoteId={note.id}
-            onNoteClick={handleNoteClick}
-          />
+        <div>
+          <NoteGraph notes={allNotes} currentNoteId={note.id} onNoteClick={handleNoteClick} />
         </div>
       </div>
     </div>
