@@ -13,7 +13,7 @@ export default function ZettelCreate() {
   const handleSubmit = async (data: ZettelRequest) => {
     try {
       setIsSubmitting(true)
-      const response = await api.post<{ id: string }>('/api/notes', data)
+      const response = await api.post<{ id: string }>('/notes', data)
       navigate(`/notes/${response.data.id}`)
     } catch (err) {
       setError('Не удалось создать заметку')

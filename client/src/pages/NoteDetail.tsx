@@ -19,8 +19,8 @@ export default function NoteDetail() {
       try {
         setLoading(true)
         const [noteResponse, notesResponse] = await Promise.all([
-          api.get<Note>(`/api/notes/${id}`),
-          api.get<Note[]>('/api/notes')
+          api.get<Note>(`/notes/${id}`),
+          api.get<Note[]>('/notes')
         ])
         setNote(noteResponse.data)
         setAllNotes(notesResponse.data)

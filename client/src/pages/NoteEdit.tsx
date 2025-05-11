@@ -17,7 +17,7 @@ export default function NoteEdit() {
     const fetchZettel = async () => {
       try {
         setLoading(true)
-        const response = await api.get<Zettel>(`/api/notes/${id}`)
+        const response = await api.get<Zettel>(`/notes/${id}`)
         setZettel(response.data)
         setError(null)
       } catch (err) {
@@ -37,9 +37,9 @@ export default function NoteEdit() {
     try {
       setIsSubmitting(true)
       if (id) {
-        await api.put(`/api/notes/${id}`, data)
+        await api.put(`/notes/${id}`, data)
       } else {
-        await api.post('/api/notes', data)
+        await api.post('/notes', data)
       }
       navigate(`/notes/${id}`)
     } catch (err) {

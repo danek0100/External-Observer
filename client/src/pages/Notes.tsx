@@ -16,7 +16,7 @@ export default function Notes() {
     const fetchZettels = async () => {
       try {
         setLoading(true)
-        const response = await api.get<Zettel[]>('/api/notes', {
+        const response = await api.get<Zettel[]>('/notes', {
           params: { path }
         })
         setZettels(response.data)
