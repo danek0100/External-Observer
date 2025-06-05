@@ -10,6 +10,8 @@ const Notes = lazy(() => import('./pages/Notes'))
 const NoteDetail = lazy(() => import('./pages/NoteDetail'))
 const NoteEdit = lazy(() => import('./pages/NoteEdit'))
 const ZettelCreate = lazy(() => import('./components/ZettelCreate'))
+const Habits = lazy(() => import('./pages/Habits'))
+const HabitChecklist = lazy(() => import('./pages/HabitChecklist'))
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
     const token = authService.getToken()
@@ -28,6 +30,8 @@ function App() {
                         <Route path="notes/new" element={<ZettelCreate />} />
                         <Route path="notes/:id" element={<NoteDetail />} />
                         <Route path="notes/:id/edit" element={<NoteEdit />} />
+                        <Route path="habits" element={<Habits />} />
+                        <Route path="habits/checklist" element={<HabitChecklist />} />
                     </Route>
                 </Routes>
             </Suspense>

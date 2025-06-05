@@ -8,6 +8,8 @@ import { FileOperations } from './FileOperations'
 const navigation = [
   { name: 'Главная', href: '/' },
   { name: 'Заметки', href: '/notes' },
+  { name: 'Привычки', href: '/habits' },
+  { name: 'Чек-лист', href: '/habits/checklist' },
   { name: 'Задачи', href: '/tasks' },
   { name: 'События', href: '/events' },
   { name: 'Финансы', href: '/finance' },
